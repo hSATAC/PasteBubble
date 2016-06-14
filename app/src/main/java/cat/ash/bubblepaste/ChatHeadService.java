@@ -10,11 +10,16 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.view.accessibility.AccessibilityEventCompat;
+import android.support.v4.view.accessibility.AccessibilityRecordCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewParent;
 import android.view.WindowManager;
+import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityManager;
 import android.widget.ImageView;
 
 import java.lang.ref.WeakReference;
@@ -52,21 +57,43 @@ public class ChatHeadService extends Service implements FloatingViewListener {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "onClick");
+                ViewParent parentView = v.getParent();
+                if (parentView != null) {
+                    final AccessibilityManager a11yManager =
+                            (AccessibilityManager) v.getContext().getSystemService(Context.ACCESSIBILITY_SERVICE);
 
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-
-                if (!clipboard.hasPrimaryClip()) {
-                    return;
+                    if (a11yManager != null && a11yManager.isEnabled()) {
+                        final AccessibilityEvent e = AccessibilityEvent.obtain(AccessibilityEventCompat.TYPE_ANNOUNCEMENT);
+                        e.setEnabled(v.isEnabled());
+                        e.setClassName(getClass().getName());
+                        e.setPackageName(v.getContext().getPackageName());
+                        e.getText().add("test");
+                        final AccessibilityRecordCompat record = new AccessibilityRecordCompat(e);
+                        record.setSource(v);
+                        a11yManager.sendAccessibilityEvent(e);
+                        Log.d(TAG, "event sent");
+                    } else {
+                        Log.d(TAG, " no manager");
+                    }
+                } else {
+                    Log.d(TAG, "no parent");
                 }
-                ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
 
-                CharSequence pasteData = "";
-                pasteData = item.getText();
-
-                if (pasteData != null) {
-
-                    return;
-                }
+//                v.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_CLICKED);
+//                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+//
+//                if (!clipboard.hasPrimaryClip()) {
+//                    return;
+//                }
+//                ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
+//
+//                CharSequence pasteData = "";
+//                pasteData = item.getText();
+//
+//                if (pasteData != null) {
+//                    v.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_CLICKED);
+//                    return;
+//                }
             }
         });
 
