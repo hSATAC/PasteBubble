@@ -38,6 +38,8 @@ public class ChatHeadActivity extends Activity implements ServiceConnection, Cha
             unbindService(this);
             mChatHeadService.stopSelf();
         }
+
+
     }
 
     @Override

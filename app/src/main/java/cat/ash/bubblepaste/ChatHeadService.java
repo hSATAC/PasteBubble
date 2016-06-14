@@ -9,12 +9,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.view.accessibility.AccessibilityEventCompat;
+import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
+import android.support.v4.view.accessibility.AccessibilityRecordCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.FocusFinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.ImageView;
 
 import java.lang.ref.WeakReference;
@@ -52,6 +58,7 @@ public class ChatHeadService extends Service implements FloatingViewListener {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "onClick");
+
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
                 if (!clipboard.hasPrimaryClip()) {
@@ -78,6 +85,10 @@ public class ChatHeadService extends Service implements FloatingViewListener {
         mFloatingViewManager.addViewToWindow(iconView, options);
 
         startForeground(NOTIFICATION_ID, createNotification());
+
+        Intent i = new Intent(this, MyAccessibilityService.class);
+        startService(i);
+
 
         return START_REDELIVER_INTENT;
     }
