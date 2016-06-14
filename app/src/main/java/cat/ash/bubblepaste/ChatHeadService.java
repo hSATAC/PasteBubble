@@ -3,8 +3,6 @@ package cat.ash.bubblepaste;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
@@ -67,7 +65,7 @@ public class ChatHeadService extends Service implements FloatingViewListener {
                         e.setEnabled(v.isEnabled());
                         e.setClassName(getClass().getName());
                         e.setPackageName(v.getContext().getPackageName());
-                        e.getText().add("test");
+                        e.getText().add("paste");
                         final AccessibilityRecordCompat record = new AccessibilityRecordCompat(e);
                         record.setSource(v);
                         a11yManager.sendAccessibilityEvent(e);
@@ -78,22 +76,6 @@ public class ChatHeadService extends Service implements FloatingViewListener {
                 } else {
                     Log.d(TAG, "no parent");
                 }
-
-//                v.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_CLICKED);
-//                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-//
-//                if (!clipboard.hasPrimaryClip()) {
-//                    return;
-//                }
-//                ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
-//
-//                CharSequence pasteData = "";
-//                pasteData = item.getText();
-//
-//                if (pasteData != null) {
-//                    v.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_CLICKED);
-//                    return;
-//                }
             }
         });
 
@@ -106,10 +88,6 @@ public class ChatHeadService extends Service implements FloatingViewListener {
         mFloatingViewManager.addViewToWindow(iconView, options);
 
         startForeground(NOTIFICATION_ID, createNotification());
-
-        Intent i = new Intent(this, MyAccessibilityService.class);
-        startService(i);
-
 
         return START_REDELIVER_INTENT;
     }
@@ -141,8 +119,8 @@ public class ChatHeadService extends Service implements FloatingViewListener {
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setWhen(System.currentTimeMillis());
         builder.setSmallIcon(R.mipmap.ic_launcher);
-        builder.setContentTitle("ContentTitle");
-        builder.setContentText("ContentText");
+        builder.setContentTitle("BubblePaste is running");
+        builder.setContentText("Click the bubble to paste.");
         builder.setOngoing(true);
         builder.setPriority(NotificationCompat.PRIORITY_MIN);
         builder.setCategory(NotificationCompat.CATEGORY_SERVICE);

@@ -14,7 +14,7 @@ public class MyAccessibilityService extends AccessibilityService {
 
     private static final String TAG = "MyAccessibilityService";
 
-    private AccessibilityEvent mLastAccessibilityViewFocusedEvent;
+    private AccessibilityNodeInfo mLastSource;
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -23,21 +23,27 @@ public class MyAccessibilityService extends AccessibilityService {
         final int eventType = event.getEventType();
         switch (eventType) {
             case AccessibilityEvent.TYPE_ANNOUNCEMENT:
-                Log.d(TAG, "accouncement");
-                if (mLastAccessibilityViewFocusedEvent != null) {
-                    Log.d(TAG, mLastAccessibilityViewFocusedEvent.toString());
-                    AccessibilityNodeInfo source = mLastAccessibilityViewFocusedEvent.getSource();
-                    if (source == null) {
+                Log.d(TAG, "announcement");
+                if (!(event.getPackageName().equals(getPackageName())) && !(event.getText().toString().equals("paste"))) {
+                    Log.d(TAG, "Not from my app.");
+                    return;
+                }
+
+                    if (mLastSource == null) {
                         return;
                     } else {
                         Log.d(TAG, "paste");
-                        source.performAction(AccessibilityNodeInfoCompat.ACTION_PASTE);
+                        mLastSource.performAction(AccessibilityNodeInfoCompat.ACTION_PASTE);
                     }
-                }
                 break;
             case AccessibilityEvent.TYPE_VIEW_FOCUSED:
                 Log.d(TAG, "focused.");
-                mLastAccessibilityViewFocusedEvent = event;
+                AccessibilityNodeInfo source = event.getSource();
+                if (source == null) {
+                    return;
+                } else {
+                    mLastSource = source;
+                }
                 break;
             case AccessibilityEvent.TYPE_VIEW_CLICKED:
                 Log.d(TAG, "clicked.");
